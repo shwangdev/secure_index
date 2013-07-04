@@ -9,6 +9,7 @@
 
 namespace secureindex
 {
+    class SecureIndexService;
     
     class Command
     {
@@ -22,8 +23,12 @@ namespace secureindex
             }
         
         virtual ~Command(){}
-        
 
+        virtual void help()
+            {
+                std::cout<<"Hint: Help"<<std::endl;
+            }
+        
     private:
         std::string command_name;
     };
@@ -41,6 +46,71 @@ namespace secureindex
                 
             }
     };
-              
+    
+    class HelpCommand: public Command
+    {
+    public:
+        HelpCommand()
+            {
+            }
+        
+        virtual bool operator() ( const std::string & command , const cli::ShellArguments & argv );
+    };
+
+
+    class UploadFileCommand: public Command
+    {
+    public:
+        UploadFileCommand( boost::shared_ptr<SecureIndexService> ss);
+        
+        virtual bool operator()( const std::string & command, cli::ShellArguments const & argv);
+        virtual void help();
+        virtual ~UploadFileCommand();
+    private:
+        boost::shared_ptr<SecureIndexService> secure_index;
+    };
+
+    
+    class ListFileCommand:public Command
+    {
+    public:
+
+        ListFileCommand (boost::shared_ptr<SecureIndexService> ss);
+        
+        virtual bool operator()( const std::string & command, cli::ShellArguments const & argv);
+        
+        virtual void help();
+        virtual ~ListFileCommand();
+    private:
+        boost::shared_ptr<SecureIndexService> secure_index;
+        
+    };
+    
+    class DeleteFileCommand:public Command
+    {
+    public:
+        DeleteFileCommand(boost::shared_ptr<SecureIndexService> ss);
+        virtual bool operator()(const std::string &command, cli::ShellArguments const & argv);
+        virtual void help();
+        ~DeleteFileCommand();
+        
+    private:
+        boost::shared_ptr<SecureIndexService> secure_index;
+    };
+    
+    
+    class SearchWordCommand : public Command
+    {
+    public:
+        SearchWordCommand(boost::shared_ptr<SecureIndexService> ss);
+        virtual bool operator()( const std::string & command , cli::ShellArguments const & argv);
+        virtual void help();
+        virtual ~SearchWordCommand( );
+    private:
+        boost::shared_ptr<SecureIndexService> secure_index;
+
+    };
+    
+          
 }
 #endif

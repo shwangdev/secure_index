@@ -63,10 +63,11 @@ namespace secureindex
             codes.push_back(s);
         }
     }
-    
+
+
     SecureIndex::SecureIndex(boost::shared_ptr<Document> d , const Kpriv & k):doc(d), key(k)
     {
-        
+        build_index();
     }
     
     Index SecureIndex::build_index()

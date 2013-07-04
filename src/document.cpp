@@ -22,6 +22,9 @@ namespace secureindex
             std::cout<<"File : "<< doc_path << " is not existed"<<std::endl;
             
         }
+        
+        doc_path = get_document_path();
+        doc_name = get_document_name();
     }
     
     Document::Document(const Document & doc)
@@ -64,10 +67,23 @@ namespace secureindex
     
     std::string Document::get_document_path()
     {
-        return doc_path;
-        
+        if ( boost::filesystem::exists(doc_path))
+            {
+                return boost::filesystem::canonical(doc_path).string();
+            }
+        else
+            throw "Invalid document path";
     }
-
+    
+    std::string Document::get_document_name()
+    {
+        if ( boost::filesystem::exists(doc_path))
+            return boost::filesystem::basename(doc_path);
+        else
+            std::cerr<<"Invalid document path"<<std::endl;
+    }
+    
+    
     void Document::parse_doc()
     {
         if ( boost::filesystem::exists(doc_path) && 

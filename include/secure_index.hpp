@@ -60,15 +60,17 @@ namespace secureindex{
     class SecureIndex
     {
     public:
-        
-        explicit SecureIndex( boost::shared_ptr<Document> doc, const Kpriv &k);
-                
-        Index build_index();
-        
-        bool search_index(const Trapdoor & t, const Index & index);
+        SecureIndex(const Kpriv & k):key(k)
+            {
 
-    private:
+            }
         
+        SecureIndex( boost::shared_ptr<Document> doc, const Kpriv &k);
+        static bool search_index(const Trapdoor & t, const Index & index);
+
+    protected:
+        Index build_index();
+    private:
         boost::shared_ptr<Document>  doc;
         const Kpriv key;
         
