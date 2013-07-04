@@ -13,6 +13,7 @@ namespace secureindex{
 
         DBAdapter( boost::shared_ptr<Config> config );
         
+
     private:
         
         boost::shared_ptr<MysqlConnPool> poolptr;

@@ -47,14 +47,15 @@ int main () {
         std::cout<<"ok"<<std::endl;
     else
         std::cout<<"fail"<<std::endl;
-  
-    std::ostringstream  os;
-    std::string content;
-    boost::archive::text_oarchive oa(os);
+
+    std::stringstream ss;
+
+    boost::archive::text_oarchive oa(ss);
+
     oa << bloom;
-    content = os.str();
-    std::istringstream is(content);
-    boost::archive::text_iarchive ia(is);
+
+    boost::archive::text_iarchive ia(ss);
+
     basic_bloom_filter<string, NUM_BITS> filter2 ;
     ia >> filter2;
     if ( bloom == filter2)

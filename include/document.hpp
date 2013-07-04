@@ -15,6 +15,7 @@ namespace secureindex{
         explicit Document (const std::string & path );
         Document (const Document & other);
         std::string get_document_id();
+        std::string get_document_path();
 
     private:
 

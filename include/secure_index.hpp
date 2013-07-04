@@ -4,6 +4,10 @@
 #include <string>
 #include <vector>
 #include <boost/bloom_filter/basic_bloom_filter.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/serialization/bitset.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/string.hpp>
 
 namespace secureindex{
 
@@ -33,6 +37,13 @@ namespace secureindex{
     {
         std::string doc_id;
         bloom_filter bf;
+
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version)
+            {
+                ar & doc_id ;
+                ar & bf;
+            }
     };
     
     struct Trapdoor
@@ -50,7 +61,7 @@ namespace secureindex{
     {
     public:
         
-        explicit SecureIndex( Document & doc, const Kpriv &k);
+        explicit SecureIndex( boost::shared_ptr<Document> doc, const Kpriv &k);
                 
         Index build_index();
         
@@ -58,7 +69,7 @@ namespace secureindex{
 
     private:
         
-        Document & doc;
+        boost::shared_ptr<Document>  doc;
         const Kpriv key;
         
     };

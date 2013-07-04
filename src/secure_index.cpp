@@ -64,32 +64,32 @@ namespace secureindex
         }
     }
     
-    SecureIndex::SecureIndex(Document & d , const Kpriv & k):doc(d), key(k)
+    SecureIndex::SecureIndex(boost::shared_ptr<Document> d , const Kpriv & k):doc(d), key(k)
     {
         
     }
     
     Index SecureIndex::build_index()
     {
-        doc.parse_doc();
-        doc.index.doc_id = doc.get_document_id();
+        doc->parse_doc();
 
-        for( std::list<std::string>::iterator it = doc.unique_words.begin();
-             it != doc.unique_words.end(); it ++ )
+        doc->index.doc_id = doc->get_document_id();
+
+        for( std::list<std::string>::iterator it = doc->unique_words.begin();
+             it != doc->unique_words.end(); it ++ )
         {
             std::string ec = dimension256(*it);
             for ( std::vector<std::string>::const_iterator itx = key.codes.begin();
                   itx != key.codes.end(); itx++)
             {
                 std::string x = pesudo_function( ec, *itx);
-                std::string y = pesudo_function( doc.index.doc_id , x);
+                std::string y = pesudo_function( doc->index.doc_id , x);
                 
-                doc.index.bf.insert(y);
-            }
-            
+                doc->index.bf.insert(y);
+            }            
         }
 
-        return doc.index;
+        return doc->index;
     }
     
     bool SecureIndex::search_index(const Trapdoor & t , const Index & i)

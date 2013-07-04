@@ -19,13 +19,15 @@ namespace secureindex
         if ( ! boost::filesystem::exists(doc_path) || 
              ! boost::filesystem::is_regular_file(doc_path))
         {
-            std::cerr<<"File: "<< doc_path << "is invalid file"<<std::endl;
-            //std::throw "Invalid file";
+            std::cout<<"File : "<< doc_path << " is not existed"<<std::endl;
+            
         }
     }
     
     Document::Document(const Document & doc)
     {
+        doc_path = doc.doc_path;
+
         if (! doc.words.empty())
         {
             this->words = doc.words;
@@ -60,7 +62,12 @@ namespace secureindex
         }
     }
     
-    
+    std::string Document::get_document_path()
+    {
+        return doc_path;
+        
+    }
+
     void Document::parse_doc()
     {
         if ( boost::filesystem::exists(doc_path) && 
