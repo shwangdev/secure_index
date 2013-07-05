@@ -69,7 +69,8 @@ namespace secureindex
     {
         if ( boost::filesystem::exists(doc_path))
             {
-                return boost::filesystem::canonical(doc_path).string();
+                //return boost::filesystem::canonical(doc_path).string();
+                return boost::filesystem::absolute(doc_path).string();
             }
         else
             throw "Invalid document path";
