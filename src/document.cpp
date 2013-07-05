@@ -78,7 +78,7 @@ namespace secureindex
     std::string Document::get_document_name()
     {
         if ( boost::filesystem::exists(doc_path))
-            return boost::filesystem::basename(doc_path);
+            return boost::filesystem::basename(doc_path) + boost::filesystem::extension(doc_path);
         else
             std::cerr<<"Invalid document path"<<std::endl;
     }
