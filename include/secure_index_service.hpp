@@ -31,8 +31,8 @@ namespace secureindex{
         void download_file_by_id ( const std::string & doc_id, 
                                    const  boost::filesystem::path & dist_file);
         
-        void download_file_by_name( const std::string & doc_name,
-                                    const boost::filesystem::path & dist_file);
+        bool download_file_by_name( const std::string & doc_name,
+                                    const std::string & dist_path);
         
         bool search_word_in_file( const std::string & word, 
                                   const std::string & remote_file_name,

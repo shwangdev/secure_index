@@ -110,6 +110,18 @@ namespace secureindex
         boost::shared_ptr<SecureIndexService> secure_index;
 
     };
+
+    class DownloadFileCommand : public Command
+    {
+    public:
+        DownloadFileCommand(boost::shared_ptr<SecureIndexService> ss);
+        virtual bool operator()( const std::string & command , cli::ShellArguments const & argv);
+        virtual void help();
+        virtual ~DownloadFileCommand( );
+    private:
+        boost::shared_ptr<SecureIndexService> secure_index;
+
+    };
     
           
 }

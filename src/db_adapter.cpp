@@ -403,4 +403,38 @@ namespace secureindex{
 
     }
     
+
+    std::string DBAdapter::get_document_by_name(std::string const & doc_name)
+    {
+        std::string result;
+        try{
+            mysqlpp::ScopedConnection cp( *poolptr,true);
+
+            std::string statement = "select * from T_DOC where doc_name = \'" + doc_name + "\'";
+
+            mysqlpp::Query query (cp->query(statement));
+
+            mysqlpp::StoreQueryResult res = query.store();
+         
+            if (res.empty())
+            {
+                std::cerr<<"File name " << doc_name <<" does not exist in remote server"<<std::endl;
+
+            }
+            else
+            { 
+                mysqlpp::String s = res[0][3];
+                result = std::string(s.data(), s.length());            
+            }
+            
+            return result;
+        }catch (const mysqlpp::BadQuery& er) {
+            std::cerr << "Query error: " << er.what() << std::endl;
+        }
+        catch (const mysqlpp::BadConversion& er) {
+            std::cerr << "Conversion error: " << er.what() << std::endl <<
+                "\tretrieved data size: " << er.retrieved <<
+                ", actual size: " << er.actual_size << std::endl;
+        }
+    }
 }

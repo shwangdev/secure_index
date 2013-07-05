@@ -133,5 +133,11 @@ namespace secureindex{
         Trapdoor t( k, word);
         return secure_index->search_index(t, index );
     }
-    
+
+    bool SecureIndexService::download_file_by_name ( const std::string & doc_name, const  std::string & dist_path) 
+    {
+        std::string ciphertext = db_adapter->get_document_by_name(doc_name);
+        boost::filesystem::path dist_file (dist_path + "/" + doc_name);
+        return file_decryption(ciphertext, dist_file);
+    }
 }

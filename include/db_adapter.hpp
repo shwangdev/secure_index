@@ -47,6 +47,7 @@ namespace secureindex{
         
         std::string get_document_index_by_name(std::string const & doc_name);
         
+        std::string get_document_by_name(std::string const & doc_name);
         
     private:
         

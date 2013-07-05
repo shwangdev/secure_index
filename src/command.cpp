@@ -177,4 +177,40 @@ namespace secureindex
     }
       
 
+    DownloadFileCommand::DownloadFileCommand(boost::shared_ptr<SecureIndexService> ss): secure_index(ss)
+    {
+        
+    }
+    DownloadFileCommand::~DownloadFileCommand()
+    {
+        
+    }
+    
+    bool DownloadFileCommand::operator()(const std::string & command, cli::ShellArguments const & argv)
+    {
+    
+        if( argv.arguments.size()!= 3)
+            help();
+        
+        else{
+            
+            if(secure_index->download_file_by_name( argv.arguments[1], argv.arguments[2]) )
+            {
+                std::cout<<"Download Success"<<std::endl;
+            }
+            else 
+            {
+                std::cout<<"Download Error"<<std::endl;
+            }
+            
+            
+        }
+        
+        return false;
+    }
+    
+    void DownloadFileCommand::help()
+    {
+        std::cout<<"Hint : downlod [File Name] [Destination Directory]"<<std::endl;
+    }
 }
