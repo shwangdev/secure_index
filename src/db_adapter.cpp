@@ -467,7 +467,7 @@ namespace secureindex{
             }
             else
             { 
-                mysqlpp::String s = res[0][3];
+                mysqlpp::String s = res[0][4];
                 result = std::string(s.data(), s.length());            
             }
             
