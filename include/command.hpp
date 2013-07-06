@@ -123,6 +123,21 @@ namespace secureindex
 
     };
     
-          
+    class OccurrenceCommand: public Command
+    {
+    public:
+
+        OccurrenceCommand ( boost::shared_ptr<SecureIndexService> ss);
+        
+        virtual bool operator()( const std::string & command, cli::ShellArguments const & argv);
+        virtual void help();
+        
+        virtual ~OccurrenceCommand();
+
+    private:
+
+        boost::shared_ptr<SecureIndexService> secure_index;
+    };
+                  
 }
 #endif

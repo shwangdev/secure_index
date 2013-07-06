@@ -8,6 +8,8 @@
 #include <cryptopp/hmac.h>
 #include <sstream>
 #include <vector>
+#include <map>
+
 namespace secureindex
 {
     std::string pesudo_function(const std::string & raw, const std::string & key)
@@ -55,19 +57,37 @@ namespace secureindex
     Trapdoor::Trapdoor(const Kpriv & k, const  std::string & w):key(k),word(w)
     {
         codes.clear();
-        std::string ec = dimension256(w);
+        //std::string ec = dimension256(w);
         for( std::vector<std::string>::const_iterator it = k.codes.begin();
              it != k.codes.end(); it ++)
         {
-            std::string s = pesudo_function( ec , *it);
+            std::string s = pesudo_function( w , *it);
             codes.push_back(s);
         }
     }
+    
+    Trapdoor::Trapdoor(const Kpriv & k , const std::string & w, int i ) :key(k),word(w)
+    {
+        codes.clear();
+        for( std::vector<std::string>::const_iterator it = k.codes.begin();
+             it != k.codes.end(); it ++)
+        {
+            std::stringstream ss ;
+            ss<<i;
+            
+            std::string count = ss.str();
+            
+            std::string s = pesudo_function( count + w , *it);
+            codes.push_back(s);
+        }
 
+    }
+    
 
     SecureIndex::SecureIndex(boost::shared_ptr<Document> d , const Kpriv & k):doc(d), key(k)
     {
         build_index();
+        o_build_index();
     }
     
     Index SecureIndex::build_index()
@@ -79,11 +99,11 @@ namespace secureindex
         for( std::list<std::string>::iterator it = doc->unique_words.begin();
              it != doc->unique_words.end(); it ++ )
         {
-            std::string ec = dimension256(*it);
+            //std::string ec = dimension256(*it);
             for ( std::vector<std::string>::const_iterator itx = key.codes.begin();
                   itx != key.codes.end(); itx++)
             {
-                std::string x = pesudo_function( ec, *itx);
+                std::string x = pesudo_function( *it , *itx);
                 std::string y = pesudo_function( doc->index.doc_id , x);
                 
                 doc->index.bf.insert(y);
@@ -92,6 +112,42 @@ namespace secureindex
 
         return doc->index;
     }
+    
+    Index SecureIndex::o_build_index()
+    {
+        
+        if ( doc->words.empty())
+            doc->parse_doc();
+
+        doc->oindex.doc_id = doc->get_document_id();
+        
+        std::map<std::string, int> word_count;
+        
+        for( std::list<std::string>::iterator it = doc->words.begin();
+             it != doc->words.end(); it ++)
+        {
+            std::map<std::string , int> ::iterator idx = word_count.find(*it);
+            if ( idx == word_count.end())
+                word_count[*it] = 1;
+            else
+                word_count[*it] = word_count[*it] +1 ;
+            
+            for ( std::vector<std::string>::const_iterator itx = key.codes.begin();
+                  itx != key.codes.end(); itx ++)
+            {
+                std::stringstream ss;
+                ss << word_count[*it];
+                
+                std::string x = pesudo_function( ss.str() + *it, *itx);
+                std::string y = pesudo_function( doc->oindex.doc_id , x);
+                doc->oindex.bf.insert(y);
+            }
+            
+        }
+        
+        return doc->oindex;
+    }
+    
     
     bool SecureIndex::search_index(const Trapdoor & t , const Index & i)
     {

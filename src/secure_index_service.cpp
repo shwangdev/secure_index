@@ -14,8 +14,10 @@
 #include <sstream>
 
 namespace secureindex{
+
     byte key[CryptoPP::DES::DEFAULT_KEYLENGTH] = {0x29, 0x4F, 0x5B, 0x4E, 0x42, 0x5D, 0x36, 0x2C};
     byte iv[ CryptoPP::DES::BLOCKSIZE ] = {0};
+
     SecureIndexService::SecureIndexService(boost::shared_ptr<Config> config_)
     {
         config = config_;
@@ -85,13 +87,18 @@ namespace secureindex{
         
         Index index = doc->index;
         
-        std::stringstream ss;
+        Index oindex = doc->oindex;
+        
+        std::stringstream ssi, sso;
 
-        boost::archive::text_oarchive oa(ss);
+        boost::archive::text_oarchive oai(ssi);
+        boost::archive::text_oarchive oao(sso);
         
-        oa << index;
+        oai << index;
+        oao << oindex;
         
-        std::string index_content = ss.str();
+        std::string index_content = ssi.str();
+        std::string oindex_content = sso.str();
         
         std::cout<<"Upload File: "<< doc->get_document_name()<<std::endl;
         std::cout<<"File   ID  : "<< doc->get_document_id()<<std::endl;
@@ -99,6 +106,7 @@ namespace secureindex{
         db_adapter->add_document(doc->get_document_id(),
                                  doc->get_document_name(),
                                  index_content,
+                                 oindex_content,
                                  file_content);
                 
     }
@@ -134,10 +142,32 @@ namespace secureindex{
         return secure_index->search_index(t, index );
     }
 
+    bool SecureIndexService::occurrence_word_in_file(const std::string & word, 
+                                                    const std::string & remote_file,
+                                                    int occur,
+                                                    const std::string & password)
+    {
+        Kpriv k(password, 4);
+        
+        std::string oindex_content = db_adapter->get_document_oindex_by_name(remote_file);
+        
+        std::stringstream ss(oindex_content);
+        boost::archive::text_iarchive ia(ss);
+        
+        Index oindex;
+        
+        ia>> oindex;
+        
+        boost::shared_ptr<SecureIndex> secure_index (new SecureIndex(k));
+        Trapdoor t( k, word, occur);
+        return secure_index->search_index(t,oindex);
+    }
+    
     bool SecureIndexService::download_file_by_name ( const std::string & doc_name, const  std::string & dist_path) 
     {
         std::string ciphertext = db_adapter->get_document_by_name(doc_name);
         boost::filesystem::path dist_file (dist_path + "/" + doc_name);
         return file_decryption(ciphertext, dist_file);
     }
+
 }

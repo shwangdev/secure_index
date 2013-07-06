@@ -1,6 +1,7 @@
 #include "command.hpp"
 #include "secure_index_service.hpp"
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 #include <vector>
 #include <utility>
 #include <string>
@@ -213,4 +214,58 @@ namespace secureindex
     {
         std::cout<<"Hint : downlod [File Name] [Destination Directory]"<<std::endl;
     }
+
+    OccurrenceCommand::OccurrenceCommand( boost::shared_ptr<SecureIndexService> ss):secure_index(ss)
+    {
+        
+    }
+    
+    OccurrenceCommand::~OccurrenceCommand()
+    {
+
+    }
+    
+    bool OccurrenceCommand::operator()( const std::string & command, cli::ShellArguments const & argv)
+    {
+        if ( argv.arguments.size() != 5 )
+            help();
+        
+        else
+        {
+            int count = 0;
+            try{
+                count = boost::lexical_cast<int>( argv.arguments[2] );
+
+                bool result = secure_index->occurrence_word_in_file( argv.arguments[1],
+                                                                     argv.arguments[3],
+                                                                     count , 
+                                                                     argv.arguments[4]);
+
+                if ( result)
+                    std::cout<<"Word : "<< argv.arguments[1]
+                             <<" occurs at least "<< count 
+                             <<" times in file "<< argv.arguments[3]<<std::endl;
+                else
+                    std::cout<<"Word : "<< argv.arguments[1]
+                             <<" does not occur "<<count
+                             <<" times in file "<< argv.arguments[3]<<std::endl;
+        
+            }
+            catch (boost::bad_lexical_cast &)
+            {
+                std::cerr<<"Invaid occurrence count"<<std::endl;
+                return false;
+            }
+                        
+        }
+        return false;
+    }
+
+    void OccurrenceCommand::help()
+    {
+        std::cout<<"Hint : occur [ Word ] [ Numb ] [ File Name ] [ Password]" <<std::endl;
+        
+    }
+    
+    
 }

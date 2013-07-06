@@ -64,6 +64,7 @@ namespace secureindex{
     void DBAdapter::add_document(std::string const & doc_id,
                                  std::string const & doc_name,
                                  std::string const & index,
+                                 std::string const & o_index,
                                  std::string const & stream)
     {
         try{
@@ -78,6 +79,7 @@ namespace secureindex{
             T_DOC row(doc_id, doc_name);
 
             row.doc_index = index;
+            row.doc_o_index = o_index;
             row.ciphertext = stream;
             
             query.reset();
@@ -234,6 +236,7 @@ namespace secureindex{
                                            std::string const & new_doc_id,
                                            std::string const & new_doc_name,
                                            std::string const & doc_index,
+                                           std::string const & doc_o_index,
                                            std::string const & stream)
     {
         try{
@@ -256,6 +259,8 @@ namespace secureindex{
                 T_DOC row(new_doc_id, new_doc_name);
                 
                 row.doc_index = doc_index;
+                
+                row.doc_o_index = doc_o_index;
                 
                 row.ciphertext = stream;
                 
@@ -283,6 +288,7 @@ namespace secureindex{
                                              std::string const & new_doc_id,
                                              std::string const & new_doc_name,
                                              std::string const & doc_index,
+                                             std::string const & doc_o_index,
                                              std::string const & stream)
     {
         try{
@@ -306,6 +312,8 @@ namespace secureindex{
                 T_DOC row(new_doc_id, new_doc_name);
                 
                 row.doc_index = doc_index;
+                
+                row.doc_o_index = doc_index;
                 
                 row.ciphertext = stream;
                 
@@ -399,10 +407,46 @@ namespace secureindex{
                 "\tretrieved data size: " << er.retrieved <<
                 ", actual size: " << er.actual_size << std::endl;
         }
+    }
+
+    std::string DBAdapter::get_document_oindex_by_name(std::string const & doc_name)
+    {
+        std::string result ;
+        
+        try{
+            mysqlpp::ScopedConnection cp( *poolptr,true);
+
+            std::string statement = "select * from T_DOC where doc_name = \'" + doc_name + "\'";
+
+            mysqlpp::Query query (cp->query(statement));
+
+            mysqlpp::StoreQueryResult res = query.store();
+         
+            if (res.empty())
+            {
+                std::cerr<<"File " << doc_name <<" does not exist in remote server"<<std::endl;
+
+            }
+            else
+            {
+                mysqlpp::String s = res[0][3];
+                result = std::string(s.data(), s.length());
+                            
+            }
+            return result;
+            
+        }catch (const mysqlpp::BadQuery& er) {
+            std::cerr << "Query error: " << er.what() << std::endl;
+        }
+        catch (const mysqlpp::BadConversion& er) {
+            std::cerr << "Conversion error: " << er.what() << std::endl <<
+                "\tretrieved data size: " << er.retrieved <<
+                ", actual size: " << er.actual_size << std::endl;
+        }
 
 
     }
-    
+
 
     std::string DBAdapter::get_document_by_name(std::string const & doc_name)
     {

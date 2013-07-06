@@ -25,6 +25,7 @@ namespace secureindex{
         void add_document( std::string const & doc_id, 
                            std::string const & doc_name,
                            std::string const & index,
+                           std::string const & o_index,
                            std::string const & encrypt_stream);
         
         void delete_document_by_id(std::string const & doc_id);
@@ -35,18 +36,22 @@ namespace secureindex{
                                     std::string const & new_doc_id,
                                     std::string const & new_doc_name,
                                     std::string const & new_doc_index,
+                                    std::string const & new_doc_o_index,
                                     std::string const & stream);
         
         void update_document_by_name ( std::string const & old_doc_name,
                                        std::string const & new_doc_name,
                                        std::string const & new_doc_id,
                                        std::string const & new_doc_index,
+                                       std::string const & new_doc_o_index,
                                        std::string const & stream);
         
         std::string get_document_index_by_id(std::string const & doc_id);
         
         std::string get_document_index_by_name(std::string const & doc_name);
         
+        std::string get_document_oindex_by_name(std::string const & doc_name);
+                
         std::string get_document_by_name(std::string const & doc_name);
         
     private:

@@ -49,7 +49,16 @@ namespace secureindex{
     struct Trapdoor
     {
         explicit Trapdoor( const Kpriv & k, const std::string & word);
+        
+        /*
+         * @param k is Kpriv
+         * @param word is the word to calculate the trapdoor
+         * @param i is the count occur
+         */
+        explicit Trapdoor( const Kpriv & k, const std::string & word, int i);
+
         std::vector<std::string> codes;
+
     private:
         std::string word;
         Kpriv key;
@@ -70,6 +79,7 @@ namespace secureindex{
 
     protected:
         Index build_index();
+        Index o_build_index();
     private:
         boost::shared_ptr<Document>  doc;
         const Kpriv key;

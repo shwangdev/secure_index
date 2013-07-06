@@ -57,7 +57,7 @@ int main(int argc, char** argv)
     secureindex::DeleteFileCommand delete_file(service);
     secureindex::SearchWordCommand search(service);
     secureindex::DownloadFileCommand download(service);
-    
+    secureindex::OccurrenceCommand occur(service);
     secureindex::ExitCommand exit;
     
     interpreter.setCallback<cli::callback::DoCommandCallback>( upload,"upload");
@@ -65,6 +65,7 @@ int main(int argc, char** argv)
     interpreter.setCallback<cli::callback::DoCommandCallback>( delete_file, "delete");
     interpreter.setCallback<cli::callback::DoCommandCallback>( search, "search");
     interpreter.setCallback<cli::callback::DoCommandCallback>( download, "download");
+    interpreter.setCallback<cli::callback::DoCommandCallback>( occur, "occur");
     interpreter.setCallback<cli::callback::DoCommandCallback>( exit , "exit");
     
     interpreter.setCallback<cli::callback::DoCommandCallback>(

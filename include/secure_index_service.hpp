@@ -38,8 +38,14 @@ namespace secureindex{
                                   const std::string & remote_file_name,
                                   const std::string & password);
 
-        void  update_file(std::string const & remote_doc_id, 
-                         boost::filesystem::path const & local_file);
+        bool occurrence_word_in_file(const std::string & word, 
+                                     const std::string & remote_file,
+                                     int occur,
+                                     const std::string & password);
+        
+
+            void  update_file(std::string const & remote_doc_id, 
+                              boost::filesystem::path const & local_file);
             
     private:
         

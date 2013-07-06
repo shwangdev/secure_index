@@ -29,6 +29,7 @@ namespace secureindex{
         std::list<std::string> words;
         std::list<std::string> unique_words;
         Index index;
+        Index oindex;
     };
 }
 #endif
