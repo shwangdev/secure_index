@@ -21,11 +21,13 @@ namespace secureindex{
     SecureIndexService::SecureIndexService(boost::shared_ptr<Config> config_)
     {
         config = config_;
-        
+       
+        //use db_adapter to operation database 
         db_adapter = boost::shared_ptr<DBAdapter> (new DBAdapter(config));
         
     }
     
+    //encryption document content
     std::string SecureIndexService::file_encryption(boost::filesystem::path const & file_path)
     {
         
@@ -33,7 +35,7 @@ namespace secureindex{
 
         if ( boost::filesystem::exists(file_path))
         {
-            
+            //encrption algorithm
             CryptoPP::CBC_Mode<CryptoPP::DES>::Encryption Encryptor(key, sizeof(key),iv);
 
             CryptoPP::FileSource( file_path.string().c_str() , true,
@@ -47,6 +49,7 @@ namespace secureindex{
         return result;
     }
 
+    //decryption document content and sotre the content in file system.
     bool SecureIndexService::file_decryption(std::string  const & data , boost::filesystem::path const & dist_file)
     {
         try{
@@ -68,13 +71,13 @@ namespace secureindex{
         
     }
 
-    
+    //list file in database
     std::vector<std::pair<std::string, std::string> > SecureIndexService::get_uploaded_file_list()
     {
         return db_adapter->get_all_remote_file_list();
     }
         
-
+    //upload file to database
     void SecureIndexService::upload_file(const boost::filesystem::path & local_file,
                                          const std::string & password)
     {
@@ -111,6 +114,7 @@ namespace secureindex{
                 
     }
     
+    //delete document in database
     void SecureIndexService::delete_file_by_id(std::string const & doc_id)
     {
 
@@ -118,11 +122,13 @@ namespace secureindex{
         
     }
     
+    //delete document in database
     void SecureIndexService::delete_file_by_name(std::string const & doc_name)
     {
         db_adapter->delete_document_by_name(doc_name);
     }
     
+    //secure index search
     bool SecureIndexService::search_word_in_file(std::string const & word, 
                                                  std::string const & remote_file,
                                                  std::string const & password)
@@ -142,6 +148,7 @@ namespace secureindex{
         return secure_index->search_index(t, index );
     }
 
+    //occurence search
     bool SecureIndexService::occurrence_word_in_file(const std::string & word, 
                                                     const std::string & remote_file,
                                                     int occur,
@@ -163,6 +170,7 @@ namespace secureindex{
         return secure_index->search_index(t,oindex);
     }
     
+    //download file from database, use file_decryption
     bool SecureIndexService::download_file_by_name ( const std::string & doc_name, const  std::string & dist_path) 
     {
         std::string ciphertext = db_adapter->get_document_by_name(doc_name);

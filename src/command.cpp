@@ -9,45 +9,59 @@
 
 namespace secureindex
 {
- 
+
+   /*
+   * Definiation of all Commands.
+   */
+
+    //UploadFileCommand: upload file to database.
     UploadFileCommand::UploadFileCommand(boost::shared_ptr<SecureIndexService> ss): secure_index(ss)
     {
         
     }
+    //Operation for UploadFileCommand.
     bool UploadFileCommand::operator()( const std::string & command, cli::ShellArguments const & argv)
     {
+        // UploadCommand require 3 arguments.
         if ( argv.arguments.size() != 3)
             help();
         else 
         {
+            //Real operation in secure_index_service.cpp.
             secure_index->upload_file( boost::filesystem::path(argv.arguments[1]),  argv.arguments[2] );
             std::cout<<"Success"<<std::endl;
         }
         return false;
     }
     
+    // Help info for UploadFileCommand.
     void UploadFileCommand::help()
     {
         std::cout<<"hint: upload [file name] [password]"<<std::endl;
     }
     
+    //Constructor.
     UploadFileCommand::~UploadFileCommand()
     {
     }
     
+    
+    //ListFileCommand: list file in database.
     ListFileCommand::ListFileCommand(boost::shared_ptr<SecureIndexService> ss): secure_index (ss)
     {
         
 
     }
     
+    //Opetation for ListFileCommand.
     bool ListFileCommand::operator()( const std::string & command, cli::ShellArguments const & argv)
     {
-        
+        //need 1 or 2 arguments. For 1 argv, display all files, for 2 argvs, display matchec files.
         if ( argv.arguments.size() != 1 && argv.arguments.size()!= 2)
             help();
         else 
         {
+            //Real operation in secure_index_service.cpp, return types is std::vector<std::pair<std::string, std::string>>
             std::vector<std::pair<std::string, std::string> > vec = secure_index->get_uploaded_file_list();
             std::cout<<cli::prettyprint::prettyprint;
             std::cout<<"File Name"<<"\t\tFile ID"<<std::endl;
@@ -55,15 +69,17 @@ namespace secureindex
                 
             if ( argv.arguments.size() == 1)
             {
-                
+                //Display all files in database
                 for( int i = 0; i< vec.size(); i ++ )
                     std::cout<<vec[i].second <<"\t\t"<<vec[i].first<<std::endl;
                 
             }
             else
             {
+                //loop each matched file, display file info
                 for ( int i = 0; i < vec.size(); i ++ )
                 {
+                    //match condition
                     if ( vec[i].first == argv.arguments[2] || vec[i].second == argv.arguments[2])
                     {
                 
@@ -77,7 +93,8 @@ namespace secureindex
         
         return false;
     }
-    
+   
+    //Help info for ListFileCommand 
     void ListFileCommand::help()
     {
         std::cout<<"Hint : list | [File Name]|[File ID]"<<std::endl;
@@ -89,6 +106,8 @@ namespace secureindex
     {
     }
 
+
+    //DeleteFileCommand
     DeleteFileCommand::DeleteFileCommand(boost::shared_ptr<SecureIndexService> ss):secure_index(ss)
     {
     }
@@ -99,6 +118,7 @@ namespace secureindex
     
     bool DeleteFileCommand::operator()( const std::string & command , cli::ShellArguments const & argv)
     {
+        //DeleteFileCommand need 2 argvs
         if ( argv.arguments.size() != 2 )
             help();
         else
@@ -116,9 +136,11 @@ namespace secureindex
                     std::cout<<"File Name"<<"\t\t"<<"File ID"<<std::endl;
                     
                     std::cout<<vec[i].second<<"\t\t"<<vec[i].first<<std::endl;
+                    
+                    //delete by file ID
                     if( vec[i].first == argv.arguments[1])
                         secure_index->delete_file_by_id(argv.arguments[1]);
-                    else
+                    else//delete by file name
                         secure_index->delete_file_by_name(argv.arguments[1]);
                     
                     std::cout<<std::endl<<"Deleted"<<std::endl;
@@ -149,12 +171,12 @@ namespace secureindex
     
     bool SearchWordCommand::operator()(const std::string & command, cli::ShellArguments const & argv)
     {
-    
+        //need 4 argvs
         if( argv.arguments.size()!= 4)
             help();
         
         else{
-            
+            //Real operation if secure_index_service.cpp
             if( secure_index->search_word_in_file( argv.arguments[1], 
                                                       argv.arguments[2], 
                                                    argv.arguments[3]) )

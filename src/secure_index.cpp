@@ -12,6 +12,7 @@
 
 namespace secureindex
 {
+    //pesudo random function
     std::string pesudo_function(const std::string & raw, const std::string & key)
     {
         std::vector<byte> buf(key.begin(),key.end());
@@ -28,6 +29,7 @@ namespace secureindex
         return mac;
     }
 
+    //calculate sha1
     std::string dimension256(const std::string & raw)
     {
         std::string digest;
@@ -41,6 +43,7 @@ namespace secureindex
         return digest;
     }
     
+    //generate s Kpriv with password
     Kpriv::Kpriv(const std::string & p, int rs):password(p), r(rs)
     {
         std::string s = dimension256(password);
@@ -54,6 +57,7 @@ namespace secureindex
         }
     }
 
+    //get a Trapdoor for search with Kpriv
     Trapdoor::Trapdoor(const Kpriv & k, const  std::string & w):key(k),word(w)
     {
         codes.clear();
@@ -83,13 +87,14 @@ namespace secureindex
 
     }
     
-
+    //build secure index and occurence index
     SecureIndex::SecureIndex(boost::shared_ptr<Document> d , const Kpriv & k):doc(d), key(k)
     {
         build_index();
         o_build_index();
     }
     
+    //build secure index
     Index SecureIndex::build_index()
     {
         doc->parse_doc();
@@ -113,6 +118,7 @@ namespace secureindex
         return doc->index;
     }
     
+    //build occurence index
     Index SecureIndex::o_build_index()
     {
         
@@ -130,6 +136,7 @@ namespace secureindex
             if ( idx == word_count.end())
                 word_count[*it] = 1;
             else
+                //record occurence times for a word
                 word_count[*it] = word_count[*it] +1 ;
             
             for ( std::vector<std::string>::const_iterator itx = key.codes.begin();
@@ -148,7 +155,7 @@ namespace secureindex
         return doc->oindex;
     }
     
-    
+    //secure index search
     bool SecureIndex::search_index(const Trapdoor & t , const Index & i)
     {
         for( std::vector<std::string>::const_iterator it = t.codes.begin();

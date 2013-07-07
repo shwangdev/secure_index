@@ -2,12 +2,19 @@
 #include <iostream>
 #include "types.hpp"
 namespace secureindex{
+
+    /*
+    * Database Access Layer, all operation related with database are here.
+    * All theses methods are called in secure_index_service.cpp
+    */
     
+    //Initiation for database connection pool.
     DBAdapter::DBAdapter( boost::shared_ptr<Config> config ):config_(config)
     {
         
         poolptr = boost::shared_ptr<MysqlConnPool>(new MysqlConnPool());
         
+        //read configuration file
         if ( ! poolptr->set_config(config))
         {
             std::cerr<<"Invalid Config for db connection pool"<<std::endl;
@@ -15,6 +22,7 @@ namespace secureindex{
         }
         mysqlpp::ScopedConnection cp(*poolptr, true);
         
+        //test whether configuration is valid
         if (!cp->thread_aware()) {
             std::cerr << "MySQL++ wasn't built with thread awareness! "
                       << std::endl;
@@ -22,6 +30,7 @@ namespace secureindex{
         }
     }
 
+    //get all files from database
     std::vector<std::pair<std::string,std::string> >  DBAdapter::get_all_remote_file_list()
     {
         std::vector<std::pair<std::string, std::string> >  vec;
@@ -60,7 +69,8 @@ namespace secureindex{
         return vec;
                 
     }
-    
+   
+    //add document to database 
     void DBAdapter::add_document(std::string const & doc_id,
                                  std::string const & doc_name,
                                  std::string const & index,
@@ -117,6 +127,7 @@ namespace secureindex{
     }
     
 
+    //determie whether a file ID is in database
     bool DBAdapter::is_exist_doc_id(std::string const & doc_id)
     {
         try{
@@ -146,6 +157,7 @@ namespace secureindex{
         }
     }
     
+    //determine whether a  file name is in database
     bool DBAdapter::is_exist_doc_name(std::string const & doc_name)
     {
         try{
@@ -177,6 +189,7 @@ namespace secureindex{
         }
     }
 
+    //delete a document in database by document id
     void DBAdapter::delete_document_by_id ( std::string const & doc_id)
     {
         try{
@@ -204,6 +217,7 @@ namespace secureindex{
         
     }
     
+    //delete document by document name
     void DBAdapter::delete_document_by_name( std::string const & doc_name)
     {
         
@@ -232,6 +246,7 @@ namespace secureindex{
     
     }
 
+    //upload document in database by document id
     void DBAdapter::update_document_by_id( std::string const & old_id,
                                            std::string const & new_doc_id,
                                            std::string const & new_doc_name,
@@ -284,6 +299,7 @@ namespace secureindex{
         }
     }
 
+    //upload document in database by document name
     void DBAdapter::update_document_by_name( std::string const & old_name,
                                              std::string const & new_doc_id,
                                              std::string const & new_doc_name,
@@ -337,6 +353,7 @@ namespace secureindex{
         }
     }    
 
+    //get document index by document id
     std::string DBAdapter::get_document_index_by_id(std::string const & doc_id)
     {
         std::string result ;
@@ -373,6 +390,8 @@ namespace secureindex{
         
     }
 
+
+    //get document index by document name
     std::string DBAdapter::get_document_index_by_name(std::string const & doc_name)
     {
         std::string result ;
@@ -447,7 +466,7 @@ namespace secureindex{
 
     }
 
-
+    //get document content from database by document name
     std::string DBAdapter::get_document_by_name(std::string const & doc_name)
     {
         std::string result;

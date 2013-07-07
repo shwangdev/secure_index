@@ -41,7 +41,7 @@ bool defaultCommandCallback(const std::string& command,
     return false;
 }
 
-
+//Enter point of projetct.
 int main(int argc, char** argv)
 {
 
@@ -52,14 +52,16 @@ int main(int argc, char** argv)
     boost::shared_ptr<secureindex::Config> config (new secureindex::Config(argv[1]));
     boost::shared_ptr<secureindex::SecureIndexService> service (new secureindex::SecureIndexService(config));
     
-    secureindex::UploadFileCommand upload(service);
-    secureindex::ListFileCommand list(service);
-    secureindex::DeleteFileCommand delete_file(service);
-    secureindex::SearchWordCommand search(service);
-    secureindex::DownloadFileCommand download(service);
-    secureindex::OccurrenceCommand occur(service);
+    //Definaitionof commands.
+    secureindex::UploadFileCommand upload(service);//upload command: upload file to Database.
+    secureindex::ListFileCommand list(service);//list command: list all uploaded files in Database.
+    secureindex::DeleteFileCommand delete_file(service);//delete command: delete file in Database.
+    secureindex::SearchWordCommand search(service);//search command: Secure Index search
+    secureindex::DownloadFileCommand download(service);//download command: Download file from Database.
+    secureindex::OccurrenceCommand occur(service);//occurrence search command: Occurrence Search
     secureindex::ExitCommand exit;
     
+    //Definition of callback command, eg: UploadFileCommand will be executed for upload.
     interpreter.setCallback<cli::callback::DoCommandCallback>( upload,"upload");
     interpreter.setCallback<cli::callback::DoCommandCallback>( list, "list");
     interpreter.setCallback<cli::callback::DoCommandCallback>( delete_file, "delete");
@@ -68,6 +70,7 @@ int main(int argc, char** argv)
     interpreter.setCallback<cli::callback::DoCommandCallback>( occur, "occur");
     interpreter.setCallback<cli::callback::DoCommandCallback>( exit , "exit");
     
+    //default command will be executed if command no in "upload list delete ...."
     interpreter.setCallback<cli::callback::DoCommandCallback>(
         &defaultCommandCallback);
 

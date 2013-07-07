@@ -2,6 +2,7 @@
 
 namespace secureindex
 {
+    //configuration of database
     Config::Config(std::string const & file)
     {
         read_ini(file);

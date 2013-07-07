@@ -14,6 +14,12 @@ using namespace stx;
 
 namespace secureindex
 {
+
+    /*
+    * Definition of Document class
+    */
+
+    //constructor
     Document::Document(const std::string & path):doc_path(path)
     {
         if ( ! boost::filesystem::exists(doc_path) || 
@@ -27,6 +33,7 @@ namespace secureindex
         doc_name = get_document_name();
     }
     
+    //constructor
     Document::Document(const Document & doc)
     {
         doc_path = doc.doc_path;
@@ -42,8 +49,10 @@ namespace secureindex
         }
     }
 
+    //calculate document id
     std::string Document::get_document_id()
     {
+        //determine whether document path is valid
         if ( boost::filesystem::exists(doc_path) &&
              boost::filesystem::is_regular_file(doc_path))
             {
@@ -51,6 +60,7 @@ namespace secureindex
                  
                 CryptoPP::SHA1 hash;
                  
+                //calculate file sha1 as Document id
                 CryptoPP::FileSource(doc_path.c_str(),true, 
                                      new CryptoPP::HashFilter(hash,  
                                                               new CryptoPP::StringSink(result),true));
@@ -64,7 +74,8 @@ namespace secureindex
             return std::string("");
         }
     }
-    
+
+    //get file path of document    
     std::string Document::get_document_path()
     {
         if ( boost::filesystem::exists(doc_path))
@@ -76,6 +87,7 @@ namespace secureindex
             throw "Invalid document path";
     }
     
+    //get file name of document
     std::string Document::get_document_name()
     {
         if ( boost::filesystem::exists(doc_path))
@@ -84,13 +96,14 @@ namespace secureindex
             std::cerr<<"Invalid document path"<<std::endl;
     }
     
-    
+    //read through the document, to store all words in document
     void Document::parse_doc()
     {
         if ( boost::filesystem::exists(doc_path) && 
              boost::filesystem::is_regular_file(doc_path))
             {
                 std::string word;
+                //use tree structure to compress the document size
                 hat_trie_traits traits;
                 traits.burst_threshold = 2;
                 hat_set<std::string> h(traits);
@@ -99,9 +112,11 @@ namespace secureindex
                 while(f)
                 {
                     f>>word;
+                    //store all words
                     words.push_back(word);
 
                     if(h.insert(word))
+                        //store unique words
                         unique_words.push_back(word);
                 }
                 f.close();

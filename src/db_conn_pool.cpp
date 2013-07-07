@@ -3,6 +3,7 @@
 #include <string>
 namespace secureindex{
     
+    //initiation of database connection pool
     bool MysqlConnPool::set_config(boost::shared_ptr <Config>  config )
     {
         config_ = config;
