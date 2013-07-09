@@ -3,12 +3,12 @@
 #include "types.hpp"
 namespace secureindex{
 
-    /*
-    * Database Access Layer, all operation related with database are here.
-    * All theses methods are called in secure_index_service.cpp
-    */
-    
-    //Initiation for database connection pool.
+    /** 
+     * Database Access Layer, all operation related with database are here.
+     * All theses methods are called in secure_index_service.cpp
+     * @param config 
+     */
+
     DBAdapter::DBAdapter( boost::shared_ptr<Config> config ):config_(config)
     {
         
@@ -30,7 +30,12 @@ namespace secureindex{
         }
     }
 
-    //get all files from database
+    /** 
+     * get file list from remote database
+     *
+     *
+     * @return 
+     */
     std::vector<std::pair<std::string,std::string> >  DBAdapter::get_all_remote_file_list()
     {
         std::vector<std::pair<std::string, std::string> >  vec;
@@ -63,14 +68,21 @@ namespace secureindex{
             std::cerr << "Conversion error: " << er.what() << std::endl <<
                 "\tretrieved data size: " << er.retrieved <<
                 ", actual size: " << er.actual_size << std::endl;
-            
-            
+                        
         }
         return vec;
                 
     }
    
-    //add document to database 
+    /** 
+     *  Add a document to database which contains 5 params
+     *
+     * @param doc_id  document id
+     * @param doc_name document name
+     * @param index normal document index
+     * @param o_index occrrence document index
+     * @param stream encrypted document content
+     */
     void DBAdapter::add_document(std::string const & doc_id,
                                  std::string const & doc_name,
                                  std::string const & index,
@@ -127,7 +139,13 @@ namespace secureindex{
     }
     
 
-    //determie whether a file ID is in database
+    /** 
+     * Check if document id is in database
+     *
+     * @param doc_id 
+     *
+     * @return 
+     */
     bool DBAdapter::is_exist_doc_id(std::string const & doc_id)
     {
         try{
@@ -157,7 +175,13 @@ namespace secureindex{
         }
     }
     
-    //determine whether a  file name is in database
+    /** 
+     * Check if a document name is in database
+     *
+     * @param doc_name 
+     *
+     * @return 
+     */
     bool DBAdapter::is_exist_doc_name(std::string const & doc_name)
     {
         try{
@@ -189,7 +213,11 @@ namespace secureindex{
         }
     }
 
-    //delete a document in database by document id
+    /** 
+     * Delete a doucment item from database by doucment id
+     *
+     * @param doc_id 
+     */
     void DBAdapter::delete_document_by_id ( std::string const & doc_id)
     {
         try{
@@ -217,7 +245,11 @@ namespace secureindex{
         
     }
     
-    //delete document by document name
+    /** 
+     * Delete a document item from database by document name
+     *
+     * @param doc_name 
+     */
     void DBAdapter::delete_document_by_name( std::string const & doc_name)
     {
         
@@ -353,7 +385,13 @@ namespace secureindex{
         }
     }    
 
-    //get document index by document id
+    /** 
+     * Get document index from database by doucment id
+     *
+     * @param doc_id 
+     *
+     * @return 
+     */
     std::string DBAdapter::get_document_index_by_id(std::string const & doc_id)
     {
         std::string result ;
@@ -391,7 +429,13 @@ namespace secureindex{
     }
 
 
-    //get document index by document name
+    /** 
+     * Get doucment index from database by document name
+     *
+     * @param doc_name 
+     *
+     * @return 
+     */
     std::string DBAdapter::get_document_index_by_name(std::string const & doc_name)
     {
         std::string result ;
@@ -428,6 +472,13 @@ namespace secureindex{
         }
     }
 
+    /** 
+     * Get a doucment occrrence index from database by document name
+     *
+     * @param doc_name 
+     *
+     * @return 
+     */
     std::string DBAdapter::get_document_oindex_by_name(std::string const & doc_name)
     {
         std::string result ;
@@ -466,7 +517,13 @@ namespace secureindex{
 
     }
 
-    //get document content from database by document name
+    /** 
+     * Get document content from database by document name
+     *
+     * @param doc_name 
+     *
+     * @return 
+     */
     std::string DBAdapter::get_document_by_name(std::string const & doc_name)
     {
         std::string result;

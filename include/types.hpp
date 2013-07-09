@@ -4,6 +4,7 @@
 #include <ssqls.h>
 
 namespace secureindex{
+    
     sql_create_5(T_DOC,
                  1,2,
                  mysqlpp::sql_char, doc_id,

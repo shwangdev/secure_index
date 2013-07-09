@@ -91,7 +91,7 @@ namespace cli { namespace readline
                 const std::string& prompt = std::string()) const;
 
             bool isUsingLibrary()
-                { return readlineLibrary_; }
+                { return readlineLibrary_ == NULL ; }
 
             //
             // I/O streams setters

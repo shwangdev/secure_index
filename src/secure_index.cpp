@@ -1,3 +1,12 @@
+/**
+ * @file   secure_index.cpp
+ * @author  <devil@Funtoo>
+ * @date   Mon Jul  8 09:40:52 2013
+ * 
+ * @brief   Secure Index Alogrithm implementation 
+ * 
+ * 
+ */
 #include "document.hpp"
 #include "secure_index.hpp"
 #include <iostream>
@@ -12,7 +21,14 @@
 
 namespace secureindex
 {
-    //pesudo random function
+    /** 
+     * Pesudo hash function which is used HMAC-SHA1 mode
+     *
+     * @param raw 
+     * @param key 
+     *
+     * @return 
+     */
     std::string pesudo_function(const std::string & raw, const std::string & key)
     {
         std::vector<byte> buf(key.begin(),key.end());
@@ -29,7 +45,13 @@ namespace secureindex
         return mac;
     }
 
-    //calculate sha1
+    /** 
+     * A Hash SHA256 which is used to transform a string to 256 byte dimension
+     *
+     * @param raw 
+     *
+     * @return 
+     */
     std::string dimension256(const std::string & raw)
     {
         std::string digest;
@@ -43,7 +65,12 @@ namespace secureindex
         return digest;
     }
     
-    //generate s Kpriv with password
+    /** 
+     * Kpriv structure constructor
+     *
+     * @param p 
+     * @param rs 
+     */
     Kpriv::Kpriv(const std::string & p, int rs):password(p), r(rs)
     {
         std::string s = dimension256(password);
@@ -57,11 +84,16 @@ namespace secureindex
         }
     }
 
-    //get a Trapdoor for search with Kpriv
+    /** 
+     * Trapddor constructor for normal search 
+     *
+     * @param k 
+     * @param w 
+     */
     Trapdoor::Trapdoor(const Kpriv & k, const  std::string & w):key(k),word(w)
     {
         codes.clear();
-        //std::string ec = dimension256(w);
+
         for( std::vector<std::string>::const_iterator it = k.codes.begin();
              it != k.codes.end(); it ++)
         {
@@ -70,6 +102,13 @@ namespace secureindex
         }
     }
     
+    /** 
+     * Trapdoor constructor for occurrence search
+     *
+     * @param k 
+     * @param w 
+     * @param i 
+     */
     Trapdoor::Trapdoor(const Kpriv & k , const std::string & w, int i ) :key(k),word(w)
     {
         codes.clear();
@@ -87,14 +126,25 @@ namespace secureindex
 
     }
     
-    //build secure index and occurence index
+    /** 
+     * Secure Index class construction which is 
+     *
+     * @param d 
+     * @param k 
+     */
+
     SecureIndex::SecureIndex(boost::shared_ptr<Document> d , const Kpriv & k):doc(d), key(k)
     {
         build_index();
         o_build_index();
     }
     
-    //build secure index
+    /** 
+     * Build the normal secure index of a document
+     *
+     *
+     * @return 
+     */
     Index SecureIndex::build_index()
     {
         doc->parse_doc();
@@ -118,7 +168,11 @@ namespace secureindex
         return doc->index;
     }
     
-    //build occurence index
+    /** 
+     * Buld occurrence index of a doucment
+     *
+     * @return 
+     */
     Index SecureIndex::o_build_index()
     {
         
@@ -155,7 +209,15 @@ namespace secureindex
         return doc->oindex;
     }
     
-    //secure index search
+
+    /** 
+     *  Search index implementation
+     *
+     * @param t is the provided trapdoor
+     * @param i is the provided Index
+     *
+     * @return bool if success
+     */
     bool SecureIndex::search_index(const Trapdoor & t , const Index & i)
     {
         for( std::vector<std::string>::const_iterator it = t.codes.begin();

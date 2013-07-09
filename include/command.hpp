@@ -1,3 +1,14 @@
+/**
+ * @file   command.hpp
+ * @author  <devil@Funtoo>
+ * @date   Mon Jul  8 09:35:29 2013
+ * 
+ * @brief  The command class is the real action when supported commands were enterred from cli
+ * 
+ * 
+ */
+
+
 #ifndef __COMMAND_HPP__
 #define __COMMAND_HPP__
 
@@ -11,11 +22,18 @@ namespace secureindex
 {
     class SecureIndexService;
     
+    
     class Command
     {
     public:
         Command(){}
-        
+
+        /** 
+         * 
+         * Abstruct call back function which will be implemented by extended classes.
+         *
+         * @return 
+         */
         virtual bool operator()(const std::string & command, 
                                 cli::ShellArguments const & arguments)
             {

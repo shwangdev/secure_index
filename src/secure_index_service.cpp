@@ -1,3 +1,12 @@
+/**
+ * @file   secure_index_service.cpp
+ * @author  <devil@Funtoo>
+ * @date   Tue Jul  9 13:21:30 2013
+ * 
+ * @brief  Secure Index Service Implementation
+ * 
+ * 
+ */
 #include "secure_index_service.hpp"
 #include "secure_index.hpp"
 #include <boost/filesystem.hpp>
@@ -22,12 +31,18 @@ namespace secureindex{
     {
         config = config_;
        
-        //use db_adapter to operation database 
+        
         db_adapter = boost::shared_ptr<DBAdapter> (new DBAdapter(config));
         
     }
     
-    //encryption document content
+    /** 
+     * Encryption document content
+     *
+     * @param file_path 
+     *
+     * @return 
+     */
     std::string SecureIndexService::file_encryption(boost::filesystem::path const & file_path)
     {
         
@@ -49,7 +64,15 @@ namespace secureindex{
         return result;
     }
 
-    //decryption document content and sotre the content in file system.
+    /** 
+     * Decryption document content and sotre the content in file system.
+     *
+     * @param data 
+     * @param dist_file 
+     *
+     * @return 
+     */
+
     bool SecureIndexService::file_decryption(std::string  const & data , boost::filesystem::path const & dist_file)
     {
         try{
@@ -71,7 +94,12 @@ namespace secureindex{
         
     }
 
-    //list file in database
+    /** 
+     * List file in database
+     *
+     *
+     * @return 
+     */
     std::vector<std::pair<std::string, std::string> > SecureIndexService::get_uploaded_file_list()
     {
         return db_adapter->get_all_remote_file_list();
@@ -114,7 +142,11 @@ namespace secureindex{
                 
     }
     
-    //delete document in database
+    /** 
+     * Delete document in database
+     *
+     * @param doc_id 
+     */
     void SecureIndexService::delete_file_by_id(std::string const & doc_id)
     {
 
@@ -122,13 +154,25 @@ namespace secureindex{
         
     }
     
-    //delete document in database
+    /** 
+     * Delete document in database
+     *
+     * @param doc_name 
+     */
     void SecureIndexService::delete_file_by_name(std::string const & doc_name)
     {
         db_adapter->delete_document_by_name(doc_name);
     }
     
-    //secure index search
+    /** 
+     * Search a word in a file
+     *
+     * @param word 
+     * @param remote_file 
+     * @param password 
+     *
+     * @return 
+     */
     bool SecureIndexService::search_word_in_file(std::string const & word, 
                                                  std::string const & remote_file,
                                                  std::string const & password)
@@ -148,7 +192,17 @@ namespace secureindex{
         return secure_index->search_index(t, index );
     }
 
-    //occurence search
+    /** 
+     * Occrrence search in a file
+     *
+     * @param word 
+     * @param remote_file 
+     * @param occur 
+     * @param password 
+     *
+     * @return 
+     */
+
     bool SecureIndexService::occurrence_word_in_file(const std::string & word, 
                                                     const std::string & remote_file,
                                                     int occur,
@@ -170,7 +224,14 @@ namespace secureindex{
         return secure_index->search_index(t,oindex);
     }
     
-    //download file from database, use file_decryption
+    /** 
+     * Download file from database, use file_decryption
+     *
+     * @param doc_name 
+     * @param dist_path 
+     *
+     * @return 
+     */
     bool SecureIndexService::download_file_by_name ( const std::string & doc_name, const  std::string & dist_path) 
     {
         std::string ciphertext = db_adapter->get_document_by_name(doc_name);

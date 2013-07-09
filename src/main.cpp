@@ -1,3 +1,13 @@
+/**
+ * @file   main.cpp
+ * @author  <devil@Funtoo>
+ * @date   Mon Jul  8 09:23:05 2013
+ * 
+ * @brief  The main file which generate the executable binray for secureindex demo
+ * 
+ * 
+ */
+
 #include <iostream>
 #include <string>
 
@@ -17,6 +27,16 @@ const char INTRO_TEXT[] = "\x1b[2J\x1b[H"
 const char PROMPT_TEXT[] = "secure index > $ ";
 
 
+/** 
+ * exitCommandCallback is the the callback function which will be executed with command "exit" entered in cli.
+ *
+ * @param command is "exit"
+ * @param arguments is None
+ *
+ * @return 
+ */
+
+
 bool exitCommandCallback(const std::string& command,
                          cli::ShellArguments const& arguments)
 {
@@ -26,6 +46,14 @@ bool exitCommandCallback(const std::string& command,
     return true;
 }
 
+/** 
+ * default callback function to handle not supported commands.
+ *
+ * @param command 
+ * @param arguments 
+ *
+ * @return 
+ */
 bool defaultCommandCallback(const std::string& command,
                             cli::ShellArguments const& arguments)
 {

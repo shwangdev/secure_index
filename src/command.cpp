@@ -1,3 +1,13 @@
+/**
+ * @file   command.cpp
+ * @author  <devil@Funtoo>
+ * @date   Mon Jul  8 09:37:11 2013
+ * 
+ * @brief  Command Class implementation
+ * 
+ * 
+ */
+
 #include "command.hpp"
 #include "secure_index_service.hpp"
 #include <boost/filesystem.hpp>
@@ -10,9 +20,9 @@
 namespace secureindex
 {
 
-   /*
-   * Definiation of all Commands.
-   */
+    /*
+     * Definiation of all Commands.
+     */
 
     //UploadFileCommand: upload file to database.
     UploadFileCommand::UploadFileCommand(boost::shared_ptr<SecureIndexService> ss): secure_index(ss)
@@ -178,7 +188,7 @@ namespace secureindex
         else{
             //Real operation if secure_index_service.cpp
             if( secure_index->search_word_in_file( argv.arguments[1], 
-                                                      argv.arguments[2], 
+                                                   argv.arguments[2], 
                                                    argv.arguments[3]) )
             {
                 std::cout<<"Word: "<< argv.arguments[1] << " is in file "
@@ -247,6 +257,7 @@ namespace secureindex
 
     }
     
+
     bool OccurrenceCommand::operator()( const std::string & command, cli::ShellArguments const & argv)
     {
         if ( argv.arguments.size() != 5 )

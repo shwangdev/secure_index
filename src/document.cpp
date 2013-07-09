@@ -1,3 +1,13 @@
+/**
+ * @file   document.cpp
+ * @author  <devil@Funtoo>
+ * @date   Mon Jul  8 09:40:13 2013
+ * 
+ * @brief  Document class implementation
+ * 
+ * 
+ */
+
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 #include "document.hpp"
 #include <cryptopp/sha.h>
@@ -15,11 +25,11 @@ using namespace stx;
 namespace secureindex
 {
 
-    /*
-    * Definition of Document class
-    */
-
-    //constructor
+/** 
+ * 
+ *
+ * @param path 
+ */
     Document::Document(const std::string & path):doc_path(path)
     {
         if ( ! boost::filesystem::exists(doc_path) || 
@@ -55,19 +65,19 @@ namespace secureindex
         //determine whether document path is valid
         if ( boost::filesystem::exists(doc_path) &&
              boost::filesystem::is_regular_file(doc_path))
-            {
-                std::string result;
+        {
+            std::string result;
                  
-                CryptoPP::SHA1 hash;
+            CryptoPP::SHA1 hash;
                  
-                //calculate file sha1 as Document id
-                CryptoPP::FileSource(doc_path.c_str(),true, 
-                                     new CryptoPP::HashFilter(hash,  
-                                                              new CryptoPP::StringSink(result),true));
+            //calculate file sha1 as Document id
+            CryptoPP::FileSource(doc_path.c_str(),true, 
+                                 new CryptoPP::HashFilter(hash,  
+                                                          new CryptoPP::StringSink(result),true));
                  
-                std::string digest = dimension256(result);
-                return digest;
-            }
+            std::string digest = dimension256(result);
+            return digest;
+        }
         else
         {
             std::cerr<<"Invalid document: "<< doc_path<<std::endl;
@@ -79,10 +89,10 @@ namespace secureindex
     std::string Document::get_document_path()
     {
         if ( boost::filesystem::exists(doc_path))
-            {
-                //return boost::filesystem::canonical(doc_path).string();
-                return boost::filesystem::absolute(doc_path).string();
-            }
+        {
+            //return boost::filesystem::canonical(doc_path).string();
+            return boost::filesystem::absolute(doc_path).string();
+        }
         else
             throw "Invalid document path";
     }
@@ -101,26 +111,26 @@ namespace secureindex
     {
         if ( boost::filesystem::exists(doc_path) && 
              boost::filesystem::is_regular_file(doc_path))
+        {
+            std::string word;
+            //use tree structure to compress the document size
+            hat_trie_traits traits;
+            traits.burst_threshold = 2;
+            hat_set<std::string> h(traits);
+            std::ifstream f(doc_path);
+
+            while(f)
             {
-                std::string word;
-                //use tree structure to compress the document size
-                hat_trie_traits traits;
-                traits.burst_threshold = 2;
-                hat_set<std::string> h(traits);
-                std::ifstream f(doc_path);
+                f>>word;
+                //store all words
+                words.push_back(word);
 
-                while(f)
-                {
-                    f>>word;
-                    //store all words
-                    words.push_back(word);
-
-                    if(h.insert(word))
-                        //store unique words
-                        unique_words.push_back(word);
-                }
-                f.close();
+                if(h.insert(word))
+                    //store unique words
+                    unique_words.push_back(word);
             }
+            f.close();
+        }
         
         else
             throw "Invalid document file";
