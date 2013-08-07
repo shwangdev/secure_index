@@ -18,6 +18,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <boost/algorithm/string.hpp>
 
 namespace secureindex
 {
@@ -97,7 +98,9 @@ namespace secureindex
         for( std::vector<std::string>::const_iterator it = k.codes.begin();
              it != k.codes.end(); it ++)
         {
-            std::string s = pesudo_function( w , *it);
+            std::string ec = w;
+            boost::algorithm::to_lower(ec);
+            std::string s = pesudo_function( ec , *it);
             codes.push_back(s);
         }
     }
@@ -119,8 +122,9 @@ namespace secureindex
             ss<<i;
             
             std::string count = ss.str();
-            
-            std::string s = pesudo_function( count + w , *it);
+            std::string ec = w;
+            boost::algorithm::to_lower(ec);
+            std::string s = pesudo_function( count + ec, *it);
             codes.push_back(s);
         }
 
@@ -154,11 +158,12 @@ namespace secureindex
         for( std::list<std::string>::iterator it = doc->unique_words.begin();
              it != doc->unique_words.end(); it ++ )
         {
-            //std::string ec = dimension256(*it);
+            std::string ec = *it;
+            boost::algorithm::to_lower(ec);
             for ( std::vector<std::string>::const_iterator itx = key.codes.begin();
                   itx != key.codes.end(); itx++)
             {
-                std::string x = pesudo_function( *it , *itx);
+                std::string x = pesudo_function( ec , *itx);
                 std::string y = pesudo_function( doc->index.doc_id , x);
                 
                 doc->index.bf.insert(y);
@@ -198,8 +203,9 @@ namespace secureindex
             {
                 std::stringstream ss;
                 ss << word_count[*it];
-                
-                std::string x = pesudo_function( ss.str() + *it, *itx);
+                std::string ec = *it;
+                boost::algorithm::to_lower(ec);
+                std::string x = pesudo_function( ss.str() + ec , *itx);
                 std::string y = pesudo_function( doc->oindex.doc_id , x);
                 doc->oindex.bf.insert(y);
             }
