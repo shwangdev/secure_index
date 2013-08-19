@@ -17,6 +17,7 @@
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
+#include<boost/tokenizer.hpp>
 #include "trie/hat_set.h"
 #include "secure_index.hpp"
 
@@ -112,22 +113,28 @@ namespace secureindex
         if ( boost::filesystem::exists(doc_path) && 
              boost::filesystem::is_regular_file(doc_path))
         {
-            std::string word;
+            //std::string word;
             //use tree structure to compress the document size
             hat_trie_traits traits;
             traits.burst_threshold = 2;
             hat_set<std::string> h(traits);
             std::ifstream f(doc_path);
-
-            while(f)
+            std::string content;
+            while(std::getline(f, content))
             {
-                f>>word;
-                //store all words
-                words.push_back(word);
+                boost::tokenizer<> tok(content);
 
-                if(h.insert(word))
+                for(boost::tokenizer<>::iterator beg=tok.begin(); beg!=tok.end();++beg)
+                {
+                    
+                    //store all words
+                    words.push_back(*beg);
+                    
+                    if(h.insert(*beg))
                     //store unique words
-                    unique_words.push_back(word);
+                        unique_words.push_back(*beg);
+                }
+                
             }
             f.close();
         }

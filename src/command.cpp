@@ -33,12 +33,19 @@ namespace secureindex
     bool UploadFileCommand::operator()( const std::string & command, cli::ShellArguments const & argv)
     {
         // UploadCommand require 3 arguments.
-        if ( argv.arguments.size() != 3)
+        if ( argv.arguments.size() < 3)
             help();
         else 
         {
             //Real operation in secure_index_service.cpp.
-            secure_index->upload_file( boost::filesystem::path(argv.arguments[1]),  argv.arguments[2] );
+            size_t size = argv.arguments.size();
+            
+            for(int i = 0 ; i < size -2; i ++)
+            {
+                
+                secure_index->upload_file( boost::filesystem::path(argv.arguments[i+1]),  argv.arguments[size-1] );
+            }
+            
             std::cout<<"Success"<<std::endl;
         }
         return false;
@@ -47,7 +54,7 @@ namespace secureindex
     // Help info for UploadFileCommand.
     void UploadFileCommand::help()
     {
-        std::cout<<"hint: upload [file name] [password]"<<std::endl;
+        std::cout<<"hint: upload [file names] [password]"<<std::endl;
     }
     
     //Constructor.
