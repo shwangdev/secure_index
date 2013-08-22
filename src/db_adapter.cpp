@@ -108,9 +108,16 @@ namespace secureindex{
             
             if (res.empty())
             {
-                query.insert(row);
+                /**
+                 * In case timeout , we use another query to sotre the data.
+                 * 
+                 */
 
-                query.execute();
+                mysqlpp::Query action(cp->query());
+                
+                action.insert(row);
+
+                action.execute();
                 
             }
             else

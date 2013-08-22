@@ -41,13 +41,14 @@ namespace secureindex
             }
         
         virtual ~Command(){}
-
+        
         virtual void help()
             {
                 std::cout<<"Hint: Help"<<std::endl;
             }
         
     private:
+
         std::string command_name;
     };
     

@@ -9,6 +9,7 @@
  */
 #include "secure_index_service.hpp"
 #include "secure_index.hpp"
+#include "compress_util.hpp"
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <cryptopp/base64.h>
@@ -61,7 +62,7 @@ namespace secureindex{
         }
         else
             std::cerr<<"Invalid file path"<<std::endl;
-        return result;
+        return CompressUtil::compress_string(result);
     }
 
     /** 
@@ -86,6 +87,7 @@ namespace secureindex{
                                             )
                                         ) 
                 );
+            
         }catch(...)
         {
             return false;
@@ -110,11 +112,16 @@ namespace secureindex{
                                          const std::string & password)
     {
         std::string file_content = file_encryption(local_file);
+        std::cout<<"File len: "<< file_content.size()<<std::endl;
+        
         boost::shared_ptr<Document> doc (new Document(local_file.string()));
-
+        std::cout<<"File loaded!"<<std::endl;
+        
         Kpriv k(password, 4);
         
         SecureIndex(doc, k);
+
+        std::cout<<"Index generated!"<<std::endl;
         
         Index index = doc->index;
         
@@ -128,7 +135,9 @@ namespace secureindex{
         oai << index;
         oao << oindex;
         
+        
         std::string index_content = ssi.str();
+                
         std::string oindex_content = sso.str();
         
         std::cout<<"Upload File: "<< doc->get_document_name()<<std::endl;
@@ -140,6 +149,35 @@ namespace secureindex{
                                  oindex_content,
                                  file_content);
                 
+    }
+
+    void SecureIndexService::upload_folder(const boost::filesystem::path & local_folder,
+                                           const std::string & password)
+
+    {
+
+        boost::filesystem::path full_path = local_folder;
+        boost::filesystem::recursive_directory_iterator end_iter;
+        
+        for (boost::filesystem::recursive_directory_iterator iter(full_path);
+             iter!= end_iter; iter++)
+        {
+            
+            try{
+                if (boost::filesystem::is_directory( *iter ))
+                    continue;
+                else
+                {
+                    upload_file(iter->path(), password);
+                }
+            }
+            catch(...)
+            {
+                std::cerr<<"Upload folder "<<local_folder<<" Fail"<<std::endl;
+            }
+            
+        }
+        
     }
     
     /** 
@@ -179,9 +217,7 @@ namespace secureindex{
     {
         
         Kpriv k ( password, 4);
-
         std::string index_content = db_adapter->get_document_index_by_name(remote_file);
-        
         std::stringstream ss(index_content);
         boost::archive::text_iarchive ia(ss);
         
@@ -234,7 +270,7 @@ namespace secureindex{
      */
     bool SecureIndexService::download_file_by_name ( const std::string & doc_name, const  std::string & dist_path) 
     {
-        std::string ciphertext = db_adapter->get_document_by_name(doc_name);
+        std::string ciphertext = CompressUtil::decompress_string(db_adapter->get_document_by_name(doc_name));
         boost::filesystem::path dist_file (dist_path + "/" + doc_name);
         return file_decryption(ciphertext, dist_file);
     }

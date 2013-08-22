@@ -76,7 +76,7 @@ namespace secureindex
                                  new CryptoPP::HashFilter(hash,  
                                                           new CryptoPP::StringSink(result),true));
                  
-            std::string digest = dimension256(result);
+            std::string digest = dimension256(result+ doc_path);
             return digest;
         }
         else

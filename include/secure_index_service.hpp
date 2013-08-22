@@ -23,6 +23,9 @@ namespace secureindex{
         
         void upload_file( const boost::filesystem::path & file_name, 
                           std::string const & password);
+
+        void upload_folder( const boost::filesystem::path & local_folder,
+                            std::string const & password);
         
         void delete_file_by_id( std::string const & doc_id);
         

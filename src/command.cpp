@@ -42,8 +42,10 @@ namespace secureindex
             
             for(int i = 0 ; i < size -2; i ++)
             {
-                
-                secure_index->upload_file( boost::filesystem::path(argv.arguments[i+1]),  argv.arguments[size-1] );
+                if ( boost::filesystem::is_directory( boost::filesystem::path(argv.arguments[i+1]) ))
+                    secure_index->upload_folder(boost::filesystem::path(argv.arguments[i+1]),  argv.arguments[size-1] );
+                else
+                    secure_index->upload_file( boost::filesystem::path(argv.arguments[i+1]),  argv.arguments[size-1] );
             }
             
             std::cout<<"Success"<<std::endl;
