@@ -62,6 +62,7 @@ namespace secureindex
     //Constructor.
     UploadFileCommand::~UploadFileCommand()
     {
+
     }
     
     
@@ -309,5 +310,34 @@ namespace secureindex
         
     }
     
+
+    TestCommand::TestCommand(boost::shared_ptr<SecureIndexService> ss):secure_index(ss)
+    {
+
+    }
+
+    void TestCommand::help()
+    {
+        std::cout<<"Hint : test [ File name ] [ Password ] " << std::endl;
+                
+    }
+    
+    bool TestCommand::operator()( const std::string & command, cli::ShellArguments const & argv)
+
+    {
+        
+        if (argv.arguments.size() != 3)
+            help();
+        else {
+            
+            secure_index->test_file(argv.arguments[1], argv.arguments[2]);
+            
+        }
+        return false;
+    }
+    
+    TestCommand::~TestCommand()
+    {
+    }
     
 }

@@ -19,7 +19,7 @@
 #include <vector>
 #include <map>
 #include <boost/algorithm/string.hpp>
-
+#include "utility.hpp"
 namespace secureindex
 {
     /** 
@@ -139,8 +139,20 @@ namespace secureindex
 
     SecureIndex::SecureIndex(boost::shared_ptr<Document> d , const Kpriv & k):doc(d), key(k)
     {
-        build_index();
-        o_build_index();
+        {
+            TimerCalc tc("build index");
+            
+            build_index();
+            tc.stop();
+        }
+        
+        {
+            TimerCalc tc("build oindex");
+            
+            o_build_index();
+            tc.stop();
+        }
+        
     }
     
     /** 
@@ -226,14 +238,21 @@ namespace secureindex
      */
     bool SecureIndex::search_index(const Trapdoor & t , const Index & i)
     {
+        bool found = true;
+
         for( std::vector<std::string>::const_iterator it = t.codes.begin();
              it != t.codes.end(); it ++)
         {
             
             std::string y = pesudo_function(i.doc_id, *it);
             if (! i.bf.probably_contains(y))
-                return false;
+            {
+                found =  false;
+                break;
+            }
+            
         }
-        return true;
+
+        return found;
     }
 }

@@ -8,6 +8,6 @@ tool="./build/src/si_service"
 config="./src/secureindex.ini"
 
 $tool $config<<EOF
-upload data 1234
+test README.md 1234
 EOF
 

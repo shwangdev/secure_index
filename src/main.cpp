@@ -59,11 +59,11 @@ bool defaultCommandCallback(const std::string& command,
 {
 /*    using namespace cli::prettyprint;
 
-    std::cout << prettyprint;
-    std::cout << "command:   " << command << std::endl;
-    std::cout << "arguments: " << arguments << std::endl;
-    std::cout << "------------------------" << std::endl;
-    std::cout << noprettyprint << std::endl;
+      std::cout << prettyprint;
+      std::cout << "command:   " << command << std::endl;
+      std::cout << "arguments: " << arguments << std::endl;
+      std::cout << "------------------------" << std::endl;
+      std::cout << noprettyprint << std::endl;
 */
     std::cout<<"Invalid Command"<<std::endl;
     return false;
@@ -87,6 +87,7 @@ int main(int argc, char** argv)
     secureindex::SearchWordCommand search(service);//search command: Secure Index search
     secureindex::DownloadFileCommand download(service);//download command: Download file from Database.
     secureindex::OccurrenceCommand occur(service);//occurrence search command: Occurrence Search
+    secureindex::TestCommand test(service);
     secureindex::ExitCommand exit;
     
     //Definition of callback command, eg: UploadFileCommand will be executed for upload.
@@ -96,6 +97,7 @@ int main(int argc, char** argv)
     interpreter.setCallback<cli::callback::DoCommandCallback>( search, "search");
     interpreter.setCallback<cli::callback::DoCommandCallback>( download, "download");
     interpreter.setCallback<cli::callback::DoCommandCallback>( occur, "occur");
+    interpreter.setCallback<cli::callback::DoCommandCallback> ( test, "test");
     interpreter.setCallback<cli::callback::DoCommandCallback>( exit , "exit");
     
     //default command will be executed if command no in "upload list delete ...."

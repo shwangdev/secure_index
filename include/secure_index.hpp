@@ -24,7 +24,7 @@ namespace secureindex{
          *@param passcode is the password that you privided to secure index algorithm
          *@param r is the dimension of secure index
          */
-        explicit Kpriv(const std::string & passcode , int r);
+        explicit Kpriv(const std::string & passcode , int r=2);
 
         /*Store r strings in a vec */
         std::vector<std::string> codes;

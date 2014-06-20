@@ -157,6 +157,24 @@ namespace secureindex
 
         boost::shared_ptr<SecureIndexService> secure_index;
     };
-                  
+
+
+    class TestCommand: public Command
+    {
+    public:
+        TestCommand (boost::shared_ptr<SecureIndexService> ss);
+        
+        virtual bool operator()( const std::string & command , cli::ShellArguments const & argv);
+
+        virtual void help();
+
+        virtual ~TestCommand();
+        
+    private:
+
+        boost::shared_ptr<SecureIndexService> secure_index;
+        
+    };
+                      
 }
 #endif

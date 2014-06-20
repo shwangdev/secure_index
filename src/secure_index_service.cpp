@@ -22,6 +22,7 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <sstream>
+#include "utility.hpp"
 
 namespace secureindex{
 
@@ -32,9 +33,7 @@ namespace secureindex{
     {
         config = config_;
        
-        
         db_adapter = boost::shared_ptr<DBAdapter> (new DBAdapter(config));
-        
     }
     
     /** 
@@ -46,7 +45,7 @@ namespace secureindex{
      */
     std::string SecureIndexService::file_encryption(boost::filesystem::path const & file_path)
     {
-        
+      TimerCalc tc("Encryption file");
         std::string result;
 
         if ( boost::filesystem::exists(file_path))
@@ -62,7 +61,9 @@ namespace secureindex{
         }
         else
             std::cerr<<"Invalid file path"<<std::endl;
-        return CompressUtil::compress_string(result);
+        result = CompressUtil::compress_string(result);
+	tc.stop();
+	return result;
     }
 
     /** 
@@ -111,18 +112,15 @@ namespace secureindex{
     void SecureIndexService::upload_file(const boost::filesystem::path & local_file,
                                          const std::string & password)
     {
+
         std::string file_content = file_encryption(local_file);
-        std::cout<<"File len: "<< file_content.size()<<std::endl;
         
         boost::shared_ptr<Document> doc (new Document(local_file.string()));
-        std::cout<<"File loaded!"<<std::endl;
         
-        Kpriv k(password, 4);
+        Kpriv k(password);
         
         SecureIndex(doc, k);
 
-        std::cout<<"Index generated!"<<std::endl;
-        
         Index index = doc->index;
         
         Index oindex = doc->oindex;
@@ -142,13 +140,19 @@ namespace secureindex{
         
         std::cout<<"Upload File: "<< doc->get_document_name()<<std::endl;
         std::cout<<"File   ID  : "<< doc->get_document_id()<<std::endl;
+        std::cout<<"Uniq Word Count: "<< doc->unique_words.size()<<std::endl;
+        std::cout<<"Total Word Count:"<< doc->words.size()<<std::endl;
+        {
+            TimerCalc tc("upload file");
+            db_adapter->add_document(doc->get_document_id(),
+                                     doc->get_document_name(),
+                                     index_content,
+                                     oindex_content,
+                                     file_content);
+            tc.stop();
+            
+        }
         
-        db_adapter->add_document(doc->get_document_id(),
-                                 doc->get_document_name(),
-                                 index_content,
-                                 oindex_content,
-                                 file_content);
-                
     }
 
     void SecureIndexService::upload_folder(const boost::filesystem::path & local_folder,
@@ -215,17 +219,25 @@ namespace secureindex{
                                                  std::string const & remote_file,
                                                  std::string const & password)
     {
+        bool found = false;
+        {
+            TimerCalc tc("Search");
+            
+            Kpriv k ( password);
+            std::string index_content = db_adapter->get_document_index_by_name(remote_file);
+            std::stringstream ss(index_content);
+            boost::archive::text_iarchive ia(ss);
         
-        Kpriv k ( password, 4);
-        std::string index_content = db_adapter->get_document_index_by_name(remote_file);
-        std::stringstream ss(index_content);
-        boost::archive::text_iarchive ia(ss);
+            Index index ;
+            ia >> index;
+            boost::shared_ptr<SecureIndex> secure_index ( new SecureIndex(k));
+            Trapdoor t( k, word);
+            found = secure_index->search_index(t, index );
+            tc.stop();
+        }
+
+        return found;
         
-        Index index ;
-        ia >> index;
-        boost::shared_ptr<SecureIndex> secure_index ( new SecureIndex(k));
-        Trapdoor t( k, word);
-        return secure_index->search_index(t, index );
     }
 
     /** 
@@ -244,7 +256,12 @@ namespace secureindex{
                                                     int occur,
                                                     const std::string & password)
     {
-        Kpriv k(password, 4);
+        
+        TimerCalc tc("Occurrence search");
+        
+        bool found = true;
+        
+        Kpriv k(password);
         
         std::string oindex_content = db_adapter->get_document_oindex_by_name(remote_file);
         
@@ -257,8 +274,13 @@ namespace secureindex{
         
         boost::shared_ptr<SecureIndex> secure_index (new SecureIndex(k));
         Trapdoor t( k, word, occur);
-        return secure_index->search_index(t,oindex);
+        found =  secure_index->search_index(t,oindex);
+        tc.stop();
+
+        return found;
+            
     }
+    
     
     /** 
      * Download file from database, use file_decryption
@@ -268,6 +290,7 @@ namespace secureindex{
      *
      * @return 
      */
+    
     bool SecureIndexService::download_file_by_name ( const std::string & doc_name, const  std::string & dist_path) 
     {
         std::string ciphertext = CompressUtil::decompress_string(db_adapter->get_document_by_name(doc_name));
@@ -275,4 +298,32 @@ namespace secureindex{
         return file_decryption(ciphertext, dist_file);
     }
 
+    void SecureIndexService::test_file( const std::string & file_path, 
+                                        const std::string & password)
+
+    {
+        boost::shared_ptr<Document> doc(new Document(file_path));
+                
+        Kpriv k(password);
+        
+        SecureIndex(doc, k);
+        Index index = doc->index;
+
+        boost::shared_ptr<SecureIndex> secure_index (new SecureIndex(k));
+
+        for( std::list<std::string>::iterator it = doc->unique_words.begin();
+             it != doc->unique_words.end(); it ++ )
+        {
+            Trapdoor t( k, *it);
+            bool found = secure_index->search_index(t, index);
+            
+            if ( found)
+                std::cout<<*it<<"\t Pass"<<std::endl;
+            else
+                std::cout<<*it<<"\t Fail"<<std::endl;
+
+        }
+                
+    }
+    
 }

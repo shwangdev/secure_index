@@ -47,9 +47,11 @@ namespace secureindex{
                                      const std::string & password);
         
 
-            void  update_file(std::string const & remote_doc_id, 
-                              boost::filesystem::path const & local_file);
+        void  update_file(std::string const & remote_doc_id, 
+                          boost::filesystem::path const & local_file);
             
+        void test_file( std::string const & file_path, const std::string & password);
+        
     private:
         
         boost::shared_ptr<Config> config;

@@ -43,7 +43,7 @@ namespace secureindex
         doc_path = get_document_path();
         doc_name = get_document_name();
     }
-    
+
     //constructor
     Document::Document(const Document & doc)
     {
